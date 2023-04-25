@@ -7,7 +7,7 @@ print('AppEngine Version: ' .. Engine.getVersion())
 local DELAY = 1000
 
 -- Creating viewer
-local viewer = View.create('viewer2D1')
+local viewer = View.create()
 
 -- Setting up graphical overlay attributes
 local dotDecoration = View.ShapeDecoration.create()
@@ -28,7 +28,7 @@ textDecoration:setSize(40)
 local function main()
   viewer:clear()
   local img = Image.load('resources/CompactnessAndSizeSorting.bmp')
-  local imageID = viewer:addImage(img)
+  viewer:addImage(img)
   viewer:present()
   Script.sleep(DELAY) -- for demonstration purpose only
 
@@ -38,7 +38,7 @@ local function main()
   -- Finding blobs
   local objectRegion = img:threshold(0, 100)
   local objectRegion2 = objectRegion:dilate(5) -- Closing gap in open washer
-  viewer:addPixelRegion(objectRegion2, regionDecoration, nil, imageID)
+  viewer:addPixelRegion(objectRegion2, regionDecoration)
   viewer:present()
   Script.sleep(DELAY) -- for demonstration purpose only
   local objectRegionNoHoles = objectRegion2:fillHoles()
@@ -53,12 +53,12 @@ local function main()
 
   -- Plotting marker in each hole and printing the blob sort order number
   viewer:clear()
-  imageID = viewer:addImage(img)
-  for i = 1, #selectedBlobs do
-    local center = selectedBlobs[i]:getCenterOfGravity(img)
-    viewer:addShape(center, dotDecoration, nil, imageID)
-    textDecoration:setPosition(center:getX() + 20, center:getY())
-    viewer:addText(tostring(math.floor(i)), textDecoration, nil, imageID)
+  viewer:addImage(img)
+  local centers = selectedBlobs:getCenterOfGravity(img)
+  for i = 1, #centers do
+    viewer:addShape(centers[i], dotDecoration)
+    textDecoration:setPosition(centers[i]:getX() + 20, centers[i]:getY())
+    viewer:addText(tostring(math.floor(i)), textDecoration)
 
     viewer:present() -- presenting single steps
     Script.sleep(DELAY) -- for demonstration purpose only
